@@ -3,7 +3,7 @@ server:
 
 gemini:
   api:
-    key: AIzaSyDNR0t_X_Uadh-oXJvrW5SMROohqMXgsOU
+    key: ${GEMINI_API_KEY:dummy-key}
     model: ${GEMINI_MODEL:gemini-2.5-flash}
 
 logging:
