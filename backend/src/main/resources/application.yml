@@ -3,8 +3,8 @@ server:
 
 gemini:
   api:
-    key: ${GEMINI_API_KEY:dummy-key}
-    model: ${GEMINI_MODEL:gemini-2.0-flash}
+    key: AIzaSyDNR0t_X_Uadh-oXJvrW5SMROohqMXgsOU
+    model: ${GEMINI_MODEL:gemini-2.5-flash}
 
 logging:
   level:
