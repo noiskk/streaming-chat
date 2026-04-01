@@ -1,0 +1,21 @@
+server:
+  port: 8080
+
+gemini:
+  api:
+    key: ${GEMINI_API_KEY:dummy-key}
+    model: ${GEMINI_MODEL:gemini-2.0-flash}
+
+logging:
+  level:
+    io.netty.resolver.dns.DnsServerAddressStreamProviders: OFF
+
+---
+spring:
+  config:
+    activate:
+      on-profile: dummy
+
+gemini:
+  api:
+    key: not-needed-in-dummy-mode
