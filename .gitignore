@@ -1,10 +1,18 @@
+# Backend
 .gradle/
 build/
 out/
+backend/.gradle/
+backend/build/
+backend/out/
 *.class
 
+# Frontend
+frontend/node_modules/
+frontend/dist/
+
+# Common
 .env
 *.log
-
 .idea/
 *.iml
