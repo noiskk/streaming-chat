@@ -1,11 +1,13 @@
-*, *::before, *::after {
+*,
+*::before,
+*::after {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
 }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   background: #f0f2f5;
   height: 100dvh;
   display: flex;
@@ -140,7 +142,9 @@ body {
   background: transparent;
   color: #6b7280;
   cursor: pointer;
-  transition: background 0.15s, color 0.15s;
+  transition:
+    background 0.15s,
+    color 0.15s;
 }
 
 .message__icon-btn svg {
@@ -167,31 +171,44 @@ body {
 }
 
 /* ── 마크다운 스타일 ── */
-.message__content p { margin: 0 0 8px; }
-.message__content p:last-child { margin-bottom: 0; }
-.message__content strong { font-weight: 700; }
-.message__content em { font-style: italic; }
-.message__content ul, .message__content ol {
+.message__content p {
+  margin: 0 0 8px;
+}
+.message__content p:last-child {
+  margin-bottom: 0;
+}
+.message__content strong {
+  font-weight: 700;
+}
+.message__content em {
+  font-style: italic;
+}
+.message__content ul,
+.message__content ol {
   padding-left: 20px;
   margin: 6px 0;
 }
-.message__content li { margin: 2px 0; }
-.message__content h1, .message__content h2, .message__content h3 {
+.message__content li {
+  margin: 2px 0;
+}
+.message__content h1,
+.message__content h2,
+.message__content h3 {
   font-weight: 700;
   margin: 10px 0 4px;
 }
 .message__content code {
   font-family: monospace;
-  background: rgba(0,0,0,0.08);
+  background: rgba(0, 0, 0, 0.08);
   padding: 1px 5px;
   border-radius: 4px;
   font-size: 13px;
 }
 .message--user .message__content code {
-  background: rgba(255,255,255,0.2);
+  background: rgba(255, 255, 255, 0.2);
 }
 .message__content pre {
-  background: rgba(0,0,0,0.06);
+  background: rgba(0, 0, 0, 0.06);
   padding: 10px 12px;
   border-radius: 8px;
   overflow-x: auto;
@@ -207,7 +224,8 @@ body {
   margin: 8px 0;
   font-size: 14px;
 }
-.message__content th, .message__content td {
+.message__content th,
+.message__content td {
   border: 1px solid #d1d5db;
   padding: 6px 12px;
   text-align: left;
@@ -240,8 +258,13 @@ body {
 }
 
 @keyframes blink {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0; }
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
 }
 
 /* ── Input ── */
@@ -309,4 +332,36 @@ body {
 
 .chat-input__btn--stop:hover {
   background: #dc2626;
+}
+
+.scroll-to-bottom-btn {
+  position: fixed;
+  right: 24px;
+  bottom: 96px;
+  z-index: 1000;
+
+  width: 46px;
+  height: 46px;
+  border: 1px solid #d9d9d9;
+  border-radius: 50%;
+  background: #f7f7f7;
+  color: #222;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-size: 22px;
+  line-height: 1;
+  cursor: pointer;
+
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+  transition:
+    transform 0.2s ease,
+    background-color 0.2s ease,
+    opacity 0.2s ease;
+}
+
+.scroll-to-bottom-btn:hover {
+  background: #ececec;
 }
