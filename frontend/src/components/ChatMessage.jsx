@@ -1,3 +1,6 @@
+import ReactMarkdown from 'react-markdown'
+import remarkGfm from 'remark-gfm'
+
 export default function ChatMessage({ message }) {
   const isUser = message.role === 'user'
 
@@ -5,10 +8,10 @@ export default function ChatMessage({ message }) {
     <div className={`message ${isUser ? 'message--user' : 'message--assistant'}`}>
       <div className="message__bubble">
         <span className="message__role">{isUser ? '나' : 'AI'}</span>
-        <p className="message__content">
-          {message.content}
+        <div className="message__content">
+          <ReactMarkdown remarkPlugins={[remarkGfm]}>{message.content}</ReactMarkdown>
           {message.streaming && <span className="cursor">▍</span>}
-        </p>
+        </div>
       </div>
     </div>
   )

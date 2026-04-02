@@ -19,6 +19,7 @@ export function useChat() {
     abortRef.current = controller
 
     let accumulated = ''
+    let lineBuffer = ''  // 청크 경계에서 잘린 줄 보관
 
     try {
       const res = await fetch(API_URL, {
@@ -35,12 +36,20 @@ export function useChat() {
         const { value, done } = await reader.read()
         if (done) break
 
-        const chunk = decoder.decode(value, { stream: true })
-        const lines = chunk.split('\n')
+        lineBuffer += decoder.decode(value, { stream: true })
+        const lines = lineBuffer.split('\n')
+        lineBuffer = lines.pop()  // 마지막 불완전한 줄은 다음 청크로 이월
 
+        let eventDataLines = []  // 하나의 SSE 이벤트 내 data: 줄들
         for (const line of lines) {
           if (line.startsWith('data:')) {
-            const token = line.slice(5)
+            eventDataLines.push(line.slice(5))
+          } else if (line.trim() === '' && eventDataLines.length > 0) {
+            // 빈 줄 = SSE 이벤트 끝 → 여러 data: 줄을 \n으로 합침
+            const token = eventDataLines.join('\n')
+            eventDataLines = []
+            if (!token.trim()) continue
+
             accumulated += token
             setMessages(prev => {
               const next = [...prev]
