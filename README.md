@@ -1,4 +1,5 @@
 # Gemini Streaming Chat
+https://github.com/user-attachments/assets/05280d5e-d1f1-4a5d-b6d6-901f63887db7
 
 Google Gemini 응답을 실시간으로 받아보는 스트리밍 채팅 예제입니다.  
 상위 폴더 기준으로 `frontend`와 `backend`가 함께 구성되어 있으며, 프런트는 React + Vite, 백엔드는 Spring Boot WebFlux + Spring AI로 작성되어 있습니다.
