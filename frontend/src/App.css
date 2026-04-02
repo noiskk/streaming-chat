@@ -107,15 +107,55 @@ body {
   gap: 4px;
 }
 
+.message__meta {
+  display: flex;
+  align-items: center;
+  padding: 0 4px;
+}
+
 .message__role {
   font-size: 11px;
   font-weight: 600;
   color: #9ca3af;
+}
+
+.message--user .message__meta {
+  justify-content: flex-end;
+}
+
+.message__actions {
+  display: flex;
+  justify-content: flex-end;
   padding: 0 4px;
 }
 
-.message--user .message__role {
-  text-align: right;
+.message__icon-btn {
+  width: 28px;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 999px;
+  background: transparent;
+  color: #6b7280;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.message__icon-btn svg {
+  width: 16px;
+  height: 16px;
+}
+
+.message__icon-btn:hover:not(:disabled) {
+  background: #e5e7eb;
+  color: #111827;
+}
+
+.message__icon-btn:disabled {
+  opacity: 0.45;
+  cursor: default;
 }
 
 .message__content {

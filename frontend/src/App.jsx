@@ -6,9 +6,22 @@ import './App.css'
 
 export default function App() {
   const { messages, streaming, sendMessage, stopStreaming, clearHistory } = useChat()
+  const messagesRef = useRef(null)
   const bottomRef = useRef(null)
+  const shouldAutoScrollRef = useRef(true)
+
+  const handleMessagesScroll = () => {
+    const container = messagesRef.current
+    if (!container) return
+
+    const distanceFromBottom =
+      container.scrollHeight - container.scrollTop - container.clientHeight
+
+    shouldAutoScrollRef.current = distanceFromBottom < 80
+  }
 
   useEffect(() => {
+    if (!shouldAutoScrollRef.current) return
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages])
 
@@ -21,7 +34,11 @@ export default function App() {
         </button>
       </header>
 
-      <main className="app__messages">
+      <main
+        ref={messagesRef}
+        className="app__messages"
+        onScroll={handleMessagesScroll}
+      >
         {messages.length === 0 && (
           <div className="app__empty">
             <p>무엇이든 물어보세요</p>
