@@ -17,7 +17,7 @@ import java.util.concurrent.atomic.AtomicReference;
 public class ChatService {
 
     private final ChatModel chatModel;
-    private final List<Message> history = new CopyOnWriteArrayList<>();
+    private final List<Message> history = new ArrayList<>();
 
     public ChatService(ChatModel chatModel) {
         this.chatModel = chatModel;
