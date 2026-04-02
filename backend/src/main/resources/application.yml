@@ -1,5 +1,6 @@
 server:
   port: 8080
+
 spring:
   application:
     name: gemini-streaming
@@ -11,6 +12,7 @@ spring:
           options:
             # 실시간 스트리밍에 가장 빠르고 적합한 모델
             model: gemini-2.5-flash
+
 logging:
   level:
     io.netty.resolver.dns.DnsServerAddressStreamProviders: OFF
