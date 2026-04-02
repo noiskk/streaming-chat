@@ -2,6 +2,7 @@ package com.chat.service;
 
 import com.chat.dto.Message;
 import org.springframework.ai.chat.messages.AssistantMessage;
+import org.springframework.ai.chat.messages.SystemMessage;
 import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.prompt.Prompt;
@@ -24,6 +25,10 @@ public class ChatService {
     public Flux<String> stream(String message, List<Message> history) {
         // 1. Spring AI 규격에 맞게 대화 기록 변환
         List<org.springframework.ai.chat.messages.Message> springAiMessages = new ArrayList<>();
+
+        // 시스템 지침 설정
+//        String systemInstructions = "당신은 친절한 AI 조언자입니다. 모든 답변은 50자 이내로 간결하게 답하세요.";
+//        springAiMessages.add(new SystemMessage(systemInstructions));
 
         for (Message msg : history) {
             if ("assistant".equals(msg.role())) {
