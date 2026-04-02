@@ -10,19 +10,20 @@ import reactor.core.publisher.Flux;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicReference;
 
 @Service
 public class ChatService {
 
     private final ChatModel chatModel;
+    private final List<Message> history = new CopyOnWriteArrayList<>();
 
     public ChatService(ChatModel chatModel) {
         this.chatModel = chatModel;
     }
 
-    public Flux<String> stream(String message, List<Message> history) {
-        // 1. Spring AI 규격에 맞게 대화 기록 변환
+    public Flux<String> stream(String message) {
         List<org.springframework.ai.chat.messages.Message> springAiMessages = new ArrayList<>();
 
         for (Message msg : history) {
@@ -32,19 +33,14 @@ public class ChatService {
                 springAiMessages.add(new UserMessage(msg.content()));
             }
         }
-
-        // 2. 현재 사용자의 새로운 메시지 추가
         springAiMessages.add(new UserMessage(message));
 
-        // 3. Prompt 생성
         Prompt prompt = new Prompt(springAiMessages);
         AtomicReference<StringBuilder> accumulated = new AtomicReference<>(new StringBuilder());
 
-        // 4. ChatModel을 이용한 스트리밍 호출
         return chatModel.stream(prompt)
                 .map(response -> {
                     if (response.getResult() != null && response.getResult().getOutput() != null) {
-                        // Spring AI 버전에 따라 getText() 또는 getContent()를 사용합니다.
                         return response.getResult().getOutput().getText();
                     }
                     return "";
