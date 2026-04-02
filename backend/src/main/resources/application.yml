@@ -1,21 +1,16 @@
 server:
   port: 8080
-
-gemini:
-  api:
-    key: ${GEMINI_API_KEY:dummy-key}
-    model: ${GEMINI_MODEL:gemini-2.5-flash}
-
+spring:
+  application:
+    name: gemini-streaming
+  ai:
+    google:
+      genai:
+        api-key:
+        chat:
+          options:
+            # 실시간 스트리밍에 가장 빠르고 적합한 모델
+            model: gemini-2.5-flash
 logging:
   level:
     io.netty.resolver.dns.DnsServerAddressStreamProviders: OFF
-
----
-spring:
-  config:
-    activate:
-      on-profile: dummy
-
-gemini:
-  api:
-    key: not-needed-in-dummy-mode
