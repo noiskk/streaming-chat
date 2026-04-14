@@ -16,3 +16,9 @@ spring:
 logging:
   level:
     io.netty.resolver.dns.DnsServerAddressStreamProviders: OFF
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
