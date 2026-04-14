@@ -6,11 +6,12 @@ pipeline {
             steps {
                 dir('backend') {
                     sh 'chmod +x gradlew'
-                    // 빌드와 소나큐브 스캔을 한 번에 처리
                     withSonarQubeEnv('sonarqube') {
-                        sh './gradlew sonar \
+                        sh '''
+                        ./gradlew clean build sonar --no-daemon \
                           -Dsonar.projectKey=streaming-chat \
-                          -Dsonar.host.url=http://172.21.33.69:8000'
+                          -Dsonar.host.url=http://172.21.33.69:8000
+                        '''
                     }
                 }
             }
@@ -18,7 +19,6 @@ pipeline {
 
         stage('Quality Gate') {
             steps {
-                // 폴더 위치 상관없이 Quality Gate 상태를 기다립니다.
                 timeout(time: 2, unit: 'MINUTES') {
                     waitForQualityGate abortPipeline: true
                 }
