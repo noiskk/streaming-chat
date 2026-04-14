@@ -2,32 +2,23 @@ pipeline {
     agent any
 
     stages {
-        stage('Build') {
+        stage('Build & Sonar Scan') {
             steps {
-                    // backend 폴더로 이동해서 작업 수행
-                    dir('backend') {
-                        // 실행 권한 부여 후 빌드 및 소나큐브 실행
-                        sh 'chmod +x gradlew'
-                        sh './gradlew sonar'
+                dir('backend') {
+                    sh 'chmod +x gradlew'
+                    // 빌드와 소나큐브 스캔을 한 번에 처리
+                    withSonarQubeEnv('sonarqube') {
+                        sh './gradlew sonar \
+                          -Dsonar.projectKey=streaming-chat \
+                          -Dsonar.host.url=http://172.21.33.69:8000'
                     }
-            }
-        }
-
-        stage('SonarQube Analysis') {
-            steps {
-                withSonarQubeEnv('sonarqube') {
-                    sh '''
-                    ./gradlew sonar \
-                      -Dsonar.projectKey=streaming-chat \
-                      -Dsonar.host.url=http://http://172.21.33.69:8000 \
-                      -Dsonar.login=$SONAR_AUTH_TOKEN
-                    '''
                 }
             }
         }
 
         stage('Quality Gate') {
             steps {
+                // 폴더 위치 상관없이 Quality Gate 상태를 기다립니다.
                 timeout(time: 2, unit: 'MINUTES') {
                     waitForQualityGate abortPipeline: true
                 }
