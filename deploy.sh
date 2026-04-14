@@ -7,7 +7,7 @@ HEALTH_TIMEOUT=60
 BLUE="sw_team_1-backend-blue"   # 블루 컨테이너명
 GREEN="sw_team_1-backend-green" # 그린 컨테이너명
 NGINX="sw_team_1-nginx"         # Nginx 컨테이너명
-IMAGE_NAME="sw_team_1-backend"  # 이미지명
+IMAGE_NAME="chat-backend"       # 이미지명
 
 # 1. 현재 활성 환경 확인
 # if sw_team_1-backend-blue 컨테이너가 실행 중이면 -> blue가 운영중, green에 배포
