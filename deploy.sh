@@ -33,7 +33,7 @@
     --name $INACTIVE \
     --network streaming-chat_default \
     -p ${INACTIVE_PORT}:8080 \
-    -e GEMINI_API_KEY="$GEMINI_API_KEY" \  
+    -e GEMINI_API_KEY="$GEMINI_API_KEY" \
     chat-backend:${IMAGE_TAG}
 
   echo "[2] $INACTIVE 컨테이너 시작"
