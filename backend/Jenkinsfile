@@ -4,8 +4,12 @@ pipeline {
     stages {
         stage('Build') {
             steps {
-                sh "./gradlew sonar"
-                sh './gradlew clean build'
+                    // backend 폴더로 이동해서 작업 수행
+                    dir('backend') {
+                        // 실행 권한 부여 후 빌드 및 소나큐브 실행
+                        sh 'chmod +x gradlew'
+                        sh './gradlew sonar'
+                    }
             }
         }
 
