@@ -4,9 +4,9 @@
   # 0. 변수 설정
   IMAGE_TAG=${1:-latest}
   HEALTH_TIMEOUT=60
-  BLUE="sw_team_1-blue"   # 블루 컨테이너명
-  GREEN="sw_team_1-green" # 그린 컨테이너명
-  NGINX="sw_team_1-nginx" # Nginx 컨테이너명
+  BLUE="sw_team_1-backend-blue"
+  GREEN="sw_team_1-backend-green"
+  NGINX="sw_team_1-nginx"
 
   # 1. 현재 활성 환경 확인
   # if sw_team_1-blue 컨테이너가 실행 중이면 -> blue가 운영중, green에 배포
