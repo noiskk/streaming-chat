@@ -14,8 +14,8 @@ pipeline {
                 withSonarQubeEnv('sonarqube') {
                     sh '''
                     ./gradlew sonar \
-                      -Dsonar.projectKey=onpremise-devops \
-                      -Dsonar.host.url=http://서버IP:8000 \
+                      -Dsonar.projectKey=streaming-chat \
+                      -Dsonar.host.url=http://http://172.21.33.69:8000 \
                       -Dsonar.login=$SONAR_AUTH_TOKEN
                     '''
                 }
