@@ -7,6 +7,7 @@
   BLUE="sw_team_1-backend-blue"
   GREEN="sw_team_1-backend-green"
   NGINX="sw_team_1-nginx"
+  NETWORK_NAME="sw_team_1_network"
 
   # 1. 현재 활성 환경 확인
   # if sw_team_1-blue 컨테이너가 실행 중이면 -> blue가 운영중, green에 배포
@@ -31,7 +32,7 @@
   docker rm   $INACTIVE 2>/dev/null || true
   docker run -d \
     --name $INACTIVE \
-    --network streaming-chat_default \
+    --network $NETWORK_NAME \
     -p ${INACTIVE_PORT}:8080 \
     -e GEMINI_API_KEY="$GEMINI_API_KEY" \
     chat-backend:${IMAGE_TAG}
