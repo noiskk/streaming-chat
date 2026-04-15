@@ -1,6 +1,8 @@
 package com.chat.service;
 
 import com.chat.dto.Message;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.ai.chat.messages.AssistantMessage;
 import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.model.ChatModel;
@@ -10,12 +12,12 @@ import reactor.core.publisher.Flux;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicReference;
 
 @Service
 public class ChatService {
 
+    private static final Logger log = LoggerFactory.getLogger(ChatService.class);
     private final ChatModel chatModel;
     private final List<Message> history = new ArrayList<>();
 
@@ -55,7 +57,7 @@ public class ChatService {
                     }
                 })
                 .onErrorResume(e -> {
-                    System.err.println("=== LLM ERROR: " + e.getClass().getName() + ": " + e.getMessage());
+                    log.error("=== LLM ERROR: {}: {}", e.getClass().getName(), e.getMessage());
                     String msg = e.getMessage() != null && e.getMessage().contains("429")
                             ? "[요청 한도를 초과했습니다. 잠시 후 다시 시도해주세요]"
                             : "[오류가 발생했습니다]";
