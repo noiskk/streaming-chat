@@ -45,8 +45,8 @@ pipeline {
                 // 백엔드 이미지 빌드
                 dir('backend') {
                     sh """
-                        docker build -t ${IMAGE_NAME}:${IMAGE_TAG} .
-                        docker tag ${IMAGE_NAME}:${IMAGE_TAG} ${IMAGE_NAME}:latest
+                        docker build -t sw_team_1-backend:${IMAGE_TAG} .
+                        docker tag sw_team_1-backend:${IMAGE_TAG} sw_team_1-backend:latest
                     """
                 }
                 // 프론트엔드 이미지 빌드
@@ -72,7 +72,7 @@ pipeline {
             echo '블루-그린 배포 성공!'
         }
         failure {
-            echo '배포 중 에러가 발생했습니다.'
+            echo '빌드 또는 배포 중 에러가 발생했습니다.'
         }
     }
 }
