@@ -63,22 +63,31 @@ done
 # 4. Nginx 트래픽(upstream) 전환
 echo "[4] Nginx 설정 업데이트 시작"
 
-# (1) Nginx 컨테이너 내부의 설정 내용을 가져와서 메모리(변수)에 담고, sed로 이름 변경
-# 호스트 경로를 참조하지 않고 Nginx 컨테이너 내부 파일을 직접 읽습니다.
-NEW_CONF=$(docker exec $NGINX cat /etc/nginx/conf.d/default.conf | sed "s/${ACTIVE}/${INACTIVE}/g")
+# (1) 깃허브에서 받아온 최신 nginx.conf 파일 내용을 읽어 변수에 저장
+# 젠킨스가 git clone을 마친 상태이므로 프로젝트 루트의 ./nginx/nginx.conf를 읽습니다.
+IFILE="./nginx/nginx.conf"
 
-# (2) 수정한 내용(NEW_CONF)을 다시 Nginx 컨테이너 내부 파일에 들이붓습니다.
-# 이 방식은 파일을 지우지 않고 내용만 덮어쓰므로 'device or resource busy'가 발생하지 않습니다.
-echo "$NEW_CONF" | docker exec -i $NGINX sh -c 'cat > /etc/nginx/conf.d/default.conf'
+if [ -f "$IFILE" ]; then
+    # 깃허브 파일 내용 중 ACTIVE(구버전)를 INACTIVE(신버전)로 치환하여 메모리에 저장
+    NEW_CONF=$(cat "$IFILE" | sed "s/${ACTIVE}/${INACTIVE}/g")
+    
+    # (2) 수정한 내용을 Nginx 컨테이너의 default.conf에 들이붓기
+    # 덮어쓰기 방식을 사용하여 'device or resource busy' 에러 방지
+    echo "$NEW_CONF" | docker exec -i $NGINX sh -c 'cat > /etc/nginx/conf.d/default.conf'
+    
+    # (3) [중요] 혹시 남아있을 수 있는 중복 설정 파일 제거
+    docker exec $NGINX rm -f /etc/nginx/conf.d/nginx.conf || true
 
-# (3) 문법 체크 및 재로드
-if docker exec $NGINX nginx -t; then
-    docker exec $NGINX nginx -s reload
-    echo "    → Nginx 전환 완료: $ACTIVE → $INACTIVE"
+    # (4) Nginx 문법 체크 및 재로드
+    if docker exec $NGINX nginx -t; then
+        docker exec $NGINX nginx -s reload
+        echo "    → Nginx 전환 완료: $ACTIVE → $INACTIVE (깃허브 설정 반영)"
+    else
+        echo "    → [에러] Nginx 설정 문법 오류! 깃허브의 nginx.conf 내용을 확인하세요."
+        exit 1
+    fi
 else
-    echo "    → [에러] Nginx 설정 문법 오류!"
-    # 실패 시 디버깅을 위해 수정 시도했던 내용 출력
-    echo "$NEW_CONF"
+    echo "    → [에러] 깃허브 저장소에서 ./nginx/nginx.conf 파일을 찾을 수 없습니다."
     exit 1
 fi
 
