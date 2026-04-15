@@ -34,6 +34,7 @@ docker run -d \
   --name $INACTIVE \
   --network streaming-chat_default \
   -p ${INACTIVE_PORT}:8080 \
+  -e SPRING_AI_GOOGLE_GENAI_API_KEY=${GEMINI_API_KEY} \
   ${IMAGE_NAME}:${IMAGE_TAG}
 
 echo "[2] $INACTIVE 컨테이너 시작"
