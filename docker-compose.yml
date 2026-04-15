@@ -17,7 +17,8 @@ services:
     ports:
       - "8002:8002"
     volumes:
-      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf
+      # 디렉토리 단위 마운트 (파일 단위 마운트는 sed -i / docker cp 등 rename 불가)
+      - ./nginx:/etc/nginx/conf.d
     depends_on:
       - sw_team_1-backend-blue
       - sw_team_1-frontend
