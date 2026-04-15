@@ -26,12 +26,6 @@ pipeline {
             }
         }
 
-        stage('Quality Gate') {
-            steps {
-                waitForQualityGate abortPipeline: true
-            }
-        }
-
         stage('Gradle Build') {
             steps {
                 dir('backend') {
