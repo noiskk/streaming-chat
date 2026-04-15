@@ -63,26 +63,23 @@ done
 # 4. Nginx 트래픽(upstream) 전환
 echo "[4] Nginx 설정 업데이트 시작"
 
-if [ -f "$REAL_NGINX_CONF" ]; then
-    # [수정] device or resource busy 방지: 
-    # sed 결과를 변수에 담아 원본 파일에 덮어쓰기 (파일 삭제 안 함)
-    NEW_CONF=$(sed "s/${ACTIVE}/${INACTIVE}/g" "$REAL_NGINX_CONF")
-    echo "$NEW_CONF" > "$REAL_NGINX_CONF"
-    
-    # Nginx 컨테이너 문법 체크 및 재로드
-    if docker exec $NGINX nginx -t; then
-        docker exec $NGINX nginx -s reload
-        echo "    → Nginx 전환 완료: $ACTIVE → $INACTIVE"
-    else
-        echo "    → [에러] Nginx 설정 문법 오류!"
-        exit 1
-    fi
-else
-    # 만약 REAL_NGINX_CONF를 못 찾으면 현재 위치의 파일을 복사 시도
-    echo "    → [경고] 절대 경로 파일을 찾지 못해 현재 위치의 파일을 사용합니다."
-    sed -i "s/${ACTIVE}/${INACTIVE}/g" ./nginx/nginx.conf
-    docker cp ./nginx/nginx.conf $NGINX:/etc/nginx/conf.d/default.conf
+# (1) Nginx 컨테이너 내부의 설정 내용을 가져와서 메모리(변수)에 담고, sed로 이름 변경
+# 호스트 경로를 참조하지 않고 Nginx 컨테이너 내부 파일을 직접 읽습니다.
+NEW_CONF=$(docker exec $NGINX cat /etc/nginx/conf.d/default.conf | sed "s/${ACTIVE}/${INACTIVE}/g")
+
+# (2) 수정한 내용(NEW_CONF)을 다시 Nginx 컨테이너 내부 파일에 들이붓습니다.
+# 이 방식은 파일을 지우지 않고 내용만 덮어쓰므로 'device or resource busy'가 발생하지 않습니다.
+echo "$NEW_CONF" | docker exec -i $NGINX sh -c 'cat > /etc/nginx/conf.d/default.conf'
+
+# (3) 문법 체크 및 재로드
+if docker exec $NGINX nginx -t; then
     docker exec $NGINX nginx -s reload
+    echo "    → Nginx 전환 완료: $ACTIVE → $INACTIVE"
+else
+    echo "    → [에러] Nginx 설정 문법 오류!"
+    # 실패 시 디버깅을 위해 수정 시도했던 내용 출력
+    echo "$NEW_CONF"
+    exit 1
 fi
 
 # 5. 구버전 컨테이너 종료
