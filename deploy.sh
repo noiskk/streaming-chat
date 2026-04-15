@@ -62,15 +62,25 @@ done
 # 내부 파일은 자유롭게 교체/수정 가능 (docker cp / sed -i 모두 정상 동작)
 # (1) Git 저장소 최신 nginx.conf를 Nginx 컨테이너로 복사
 # (2) upstream server 라인을 새로 배포한 컨테이너($INACTIVE)로 변경
+# 4. Nginx 트래픽(upstream) 전환
 echo "[4] Nginx 설정 업데이트 시작"
-docker cp ./nginx/nginx.conf $NGINX:/etc/nginx/conf.d/nginx.conf
-docker exec $NGINX sed -i "s/server sw_team_1-backend-[a-z]*:/server ${INACTIVE}:/g" /etc/nginx/conf.d/nginx.conf
 
-if docker exec $NGINX nginx -t; then
-    docker exec $NGINX nginx -s reload
-    echo "    → Nginx 전환 완료: $ACTIVE → $INACTIVE"
+if [ -f "$REAL_NGINX_CONF" ]; then
+    # [수정됨] device or resource busy 에러 방지를 위해 내용만 덮어쓰기
+    cat "$REAL_NGINX_CONF" | sed "s/${ACTIVE}/${INACTIVE}/g" > "${REAL_NGINX_CONF}.new"
+    cat "${REAL_NGINX_CONF}.new" > "$REAL_NGINX_CONF"
+    rm "${REAL_NGINX_CONF}.new"
+    
+    # Nginx 컨테이너에게 설정 재로드 명령
+    if docker exec $NGINX nginx -t; then
+        docker exec $NGINX nginx -s reload
+        echo "    → Nginx 전환 완료: $ACTIVE → $INACTIVE"
+    else
+        echo "    → [에러] Nginx 설정 문법 오류!"
+        exit 1
+    fi
 else
-    echo "    → [에러] Nginx 설정 문법 오류!"
+    echo "    → [에러] Nginx 설정 파일을 찾을 수 없습니다: $REAL_NGINX_CONF"
     exit 1
 fi
 
