@@ -58,11 +58,12 @@ for i in $(seq 1 $HEALTH_TIMEOUT); do
 done
 
 # 4. Nginx 트래픽(upstream) 전환
-# (1) Git 저장소의 최신 nginx.conf를 Nginx 컨테이너 내부로 복사 (깨진 상태 복구)
+# (1) Git 저장소의 최신 nginx.conf 내용을 Nginx 컨테이너 내부 파일에 덮어쓰기
+#     - docker cp는 bind-mount된 파일을 교체 불가 (device or resource busy)
+#     - tee로 내용만 덮어쓰면 inode 유지되어 bind mount 문제 없음
 # (2) upstream server 라인을 새로 배포한 컨테이너($INACTIVE)로 변경
-# Jenkins 컨테이너에서 호스트 경로를 참조할 수 없으므로 docker cp / docker exec 사용
 echo "[4] Nginx 설정 업데이트 시작"
-docker cp ./nginx/nginx.conf $NGINX:/etc/nginx/conf.d/default.conf
+docker exec -i $NGINX tee /etc/nginx/conf.d/default.conf > /dev/null < ./nginx/nginx.conf
 docker exec $NGINX sed -i "s/server sw_team_1-backend-[a-z]*:/server ${INACTIVE}:/g" /etc/nginx/conf.d/default.conf
 
 if docker exec $NGINX nginx -t; then
