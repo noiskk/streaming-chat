@@ -50,8 +50,8 @@ for i in $(seq 1 $HEALTH_TIMEOUT); do
         break
     fi
     if [ $i -eq $HEALTH_TIMEOUT ]; then
-        echo "    → 헬스체크 실패. 롤백"
-        docker stop $INACTIVE && docker rm $INACTIVE
+        echo "    → 헬스체크 실패. 로그 확인 위해 컨테이너 유지"
+        docker ps -a | grep $INACTIVE || true
         exit 1
     fi
     sleep 1
