@@ -19,6 +19,26 @@ public class ChatService {
     private final ChatModel chatModel;
     private final List<Message> history = new ArrayList<>();
 
+    // [테스트 시나리오 3] 코드 스멜 및 유지보수성 문제 추가
+    public void someDirtyMethod(int status) {
+        String data = "some-data"; // Unused variable (Minor Code Smell)
+        
+        try {
+            if (status == 1) {
+                System.out.println("Processing status 1..."); // Use of System.out (Major Code Smell)
+                Thread.sleep(1000); // Should not use Thread.sleep() in non-test code (Major)
+            } else if (status == 2) {
+                System.out.println("Processing status 2...");
+                Thread.sleep(1000);
+            } else if (status == 3) {
+                System.out.println("Processing status 3...");
+                Thread.sleep(1000);
+            }
+        } catch (Exception e) {
+            // Empty catch block - Extremely dangerous (Critical Code Smell)
+        }
+    }
+
     public ChatService(ChatModel chatModel) {
         this.chatModel = chatModel;
     }
