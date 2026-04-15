@@ -9,6 +9,9 @@ GREEN="sw_team_1-backend-green" # 그린 컨테이너명
 NGINX="sw_team_1-nginx"         # Nginx 컨테이너명
 IMAGE_NAME="sw_team_1-backend"  # 이미지명
 
+# [추가] Nginx 컨테이너가 바라보는 호스트의 실제 절대 경로
+REAL_NGINX_CONF="/home/sw_team_1/streaming-chat/nginx/nginx.conf"
+
 # 1. 현재 활성 환경 확인
 if docker ps --filter "name=$BLUE" --filter "status=running" | grep -q $BLUE; then
     ACTIVE=$BLUE
@@ -58,20 +61,15 @@ for i in $(seq 1 $HEALTH_TIMEOUT); do
 done
 
 # 4. Nginx 트래픽(upstream) 전환
-# docker-compose.yml에서 디렉토리 단위 마운트(./nginx:/etc/nginx/conf.d)이므로
-# 내부 파일은 자유롭게 교체/수정 가능 (docker cp / sed -i 모두 정상 동작)
-# (1) Git 저장소 최신 nginx.conf를 Nginx 컨테이너로 복사
-# (2) upstream server 라인을 새로 배포한 컨테이너($INACTIVE)로 변경
-# 4. Nginx 트래픽(upstream) 전환
 echo "[4] Nginx 설정 업데이트 시작"
 
 if [ -f "$REAL_NGINX_CONF" ]; then
-    # [수정됨] device or resource busy 에러 방지를 위해 내용만 덮어쓰기
-    cat "$REAL_NGINX_CONF" | sed "s/${ACTIVE}/${INACTIVE}/g" > "${REAL_NGINX_CONF}.new"
-    cat "${REAL_NGINX_CONF}.new" > "$REAL_NGINX_CONF"
-    rm "${REAL_NGINX_CONF}.new"
+    # [수정] device or resource busy 방지: 
+    # sed 결과를 변수에 담아 원본 파일에 덮어쓰기 (파일 삭제 안 함)
+    NEW_CONF=$(sed "s/${ACTIVE}/${INACTIVE}/g" "$REAL_NGINX_CONF")
+    echo "$NEW_CONF" > "$REAL_NGINX_CONF"
     
-    # Nginx 컨테이너에게 설정 재로드 명령
+    # Nginx 컨테이너 문법 체크 및 재로드
     if docker exec $NGINX nginx -t; then
         docker exec $NGINX nginx -s reload
         echo "    → Nginx 전환 완료: $ACTIVE → $INACTIVE"
@@ -80,15 +78,18 @@ if [ -f "$REAL_NGINX_CONF" ]; then
         exit 1
     fi
 else
-    echo "    → [에러] Nginx 설정 파일을 찾을 수 없습니다: $REAL_NGINX_CONF"
-    exit 1
+    # 만약 REAL_NGINX_CONF를 못 찾으면 현재 위치의 파일을 복사 시도
+    echo "    → [경고] 절대 경로 파일을 찾지 못해 현재 위치의 파일을 사용합니다."
+    sed -i "s/${ACTIVE}/${INACTIVE}/g" ./nginx/nginx.conf
+    docker cp ./nginx/nginx.conf $NGINX:/etc/nginx/conf.d/default.conf
+    docker exec $NGINX nginx -s reload
 fi
 
-# 5. 구버전 컨테이너 종료 (Graceful Shutdown)
+# 5. 구버전 컨테이너 종료
 echo "[5] 60초 대기 후 구버전($ACTIVE) 종료..."
 docker stop --time=60 $ACTIVE 2>/dev/null || true
 
-# 6. 오래된 이미지 정리 (최근 2개만 유지)
+# 6. 이미지 정리
 echo "[6] 이미지 정리 중..."
 docker images ${IMAGE_NAME} --format "{{.Tag}}" \
   | grep -v latest \
