@@ -9,9 +9,10 @@ sonar {
     properties {
         property "sonar.projectKey", "streaming-chat"
         property "sonar.projectName", "streaming-chat"
-        property "sonar.host.url", "http://172.21.33.69:8000"
-        property "sonar.token", "squ_2325dc4aa17d735563dfa5b27f84258a7179f8e0"
+        // 호스트 URL과 토큰은 Jenkins의 withSonarQubeEnv에서 자동으로 주입되므로 제거합니다.
         property "sonar.java.binaries", "build/classes/java/main"
+        // 퀄리티 게이트 결과를 기다리고 실패 시 빌드를 중단시키는 핵심 설정
+        property "sonar.qualitygate.wait", "true"
     }
 }
 
