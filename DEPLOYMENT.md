@@ -22,7 +22,13 @@ Spring AI 기반 Gemini 스트리밍 챗봇 서비스에
 
 <br />
 
-## 🔄 배포 전략: Blue-Green 무중단 배포
+## 🛠️ Tech Stack
+
+Spring Boot, WebFlux, Spring AI, Jenkins, SonarQube, Docker, Nginx, React
+
+<br />
+
+## 🔄 Blue-Green 무중단 배포
 
 ### 개념
 
@@ -45,11 +51,12 @@ Spring AI 기반 Gemini 스트리밍 챗봇 서비스에
 <br />
 
 ## ⚙️ CI/CD 파이프라인
+
 <img width="800" height="678" alt="스크린샷 2026-04-15 오후 5 45 45" src="https://github.com/user-attachments/assets/e33e82e4-b8ee-440f-a145-4af65085ce1e" />
 
 <br />
 
-### 📌 deploy.sh 동작 흐름
+### deploy.sh 동작 흐름
 
 1. 현재 활성 환경(Blue or Green) 확인  
 2. 비활성 컨테이너에 새 버전 배포  
@@ -70,4 +77,15 @@ proxy_read_timeout 300s;
 - 스트리밍 응답 지연 방지
 - 실시간 토큰 단위 응답 유지
 
+<br />
 
+### 주요 트러블슈팅
+
+| 문제 | 원인 | 해결 |
+|------|------|------|
+| Jenkins → Backend 헬스체크 타임아웃 | Jenkins는 `bridge` 네트워크, Backend는 `streaming-chat_default` 네트워크 → 서로 다른 네트워크로 통신 불가 | `docker network connect streaming-chat_default sw_team_1_jenkins`로 동일 네트워크 연결 |
+| WebFlux CORS 오류 (`Actual request host must not be null`) | nginx → backend 요청 시 Host 헤더 누락 | `proxy_set_header Host $http_host;` 등 헤더 추가 |
+| Nginx 설정 중복 오류 (`duplicate upstream`) | `/etc/nginx/conf.d` 내 설정 파일 2개 존재 | 하나의 설정 파일만 유지하도록 정리 |
+| Jenkins에서 npm 실행 실패 | Jenkins 컨테이너에 Node.js 미설치 | Docker 멀티스테이지 빌드로 프론트 빌드 처리 |
+| npm ci 실행 오류 | package.json과 package-lock.json 불일치 | `npm install` 후 lock 파일 업데이트 |
+| Docker 네트워크 연결 실패 | docker-compose 네트워크 이름과 실제 네트워크 불일치 | `docker network ls`로 확인 후 올바른 네트워크 사용 |
