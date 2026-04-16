@@ -6,6 +6,15 @@ Google Gemini 응답을 실시간으로 받아보는 스트리밍 채팅 예제�
 
 <br />
 
+## Deployment
+
+Jenkins 기반 CI/CD 파이프라인과  
+Docker + Nginx를 활용한 Blue-Green 무중단 배포 환경을 구축했습니다.
+
+👉 배포 전략 및 인프라 구성은 [DEPLOYMENT.md](./DEPLOYMENT.md)를 참고해주세요.
+
+<br />
+
 ## 주요 기능
 
 ### Gemini 응답 스트리밍 표시
